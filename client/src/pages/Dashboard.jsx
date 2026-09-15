@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import SiteFormModal from '../components/SiteFormModal.jsx';
 import Navbar from '../components/Navbar.jsx';
+import Footer from '../components/Footer.jsx';
 import TopologyField from '../components/ui/topology-field.jsx';
 import {
   Activity, Plus, ExternalLink, Trash2, Edit3,
@@ -438,6 +439,9 @@ export default function Dashboard() {
           </>
         )}
       </main>
+
+      {/* Embedded Footer */}
+      <Footer />
 
       {modalOpen && (
         <SiteFormModal
