@@ -42,6 +42,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/sites', siteRoutes);
+app.use('/api/users', require('./routes/userRoutes'));
 
 app.use(notFoundHandler);
 app.use(errorHandler);
@@ -56,5 +57,6 @@ connectDB()
     console.error('[startup] Failed to connect to MongoDB:', err.message);
     process.exit(1);
   });
+  
 
 module.exports = app;

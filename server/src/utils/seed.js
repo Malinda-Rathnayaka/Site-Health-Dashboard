@@ -7,9 +7,14 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 
 async function run() {
-  const email = process.env.SEED_ADMIN_EMAIL || 'admin@example.com';
-  const password = process.env.SEED_ADMIN_PASSWORD || 'ChangeMe123!';
+  const email = process.env.SEED_ADMIN_EMAIL;
+  const password = process.env.SEED_ADMIN_PASSWORD;
   const name = process.env.SEED_ADMIN_NAME || 'Admin';
+
+  if (!email || !password) {
+    console.error('[seed] Error: SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD must be defined in the .env file');
+    process.exit(1);
+  }
 
   await mongoose.connect(process.env.MONGO_URI);
 
