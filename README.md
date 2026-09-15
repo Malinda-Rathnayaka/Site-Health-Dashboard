@@ -1,134 +1,108 @@
 # Site Health Dashboard
 
-A small MERN app for tracking the health status of client websites: who owns each site, its current
-status (healthy / warning / critical), when it was last checked, and free-text notes.
+A complete MERN stack application for tracking the health and status of client websites and services. It provides a beautiful, responsive dashboard to monitor operational metrics, complete with role-based access control.
 
-Monorepo layout:
+## 🚀 Features
 
+- **Role-Based Access Control (RBAC)**: 
+  - `Admin`: Full access to create, edit, delete, and assign endpoints.
+  - `Viewer`: Read-only access to monitor global mission status and telemetry.
+- **Real-Time Monitoring Dashboard**: Dynamic and highly polished UI using Tailwind CSS, glassmorphism, and a cinematic topology background.
+- **RESTful API**: Robust Express backend with complete CRUD operations, input validation, and centralized error handling.
+- **Secure Authentication**: Stateless JWT authentication with bcrypt password hashing.
+- **Rate Limiting & Sanitization**: Built-in protections against brute-force attacks and NoSQL/XSS injections.
+
+## 📂 Project Structure
+
+This is a monorepo containing both the frontend and backend applications:
+
+```text
+/server   # Express + Mongoose API
+/client   # React (Vite) frontend
 ```
-/server   Express + Mongoose API
-/client   React (Vite) frontend
+
+## 🛠️ Technology Stack
+
+- **Frontend**: React 18, Vite, Tailwind CSS (v4), React Router, Axios, Lucide React, Three.js.
+- **Backend**: Node.js, Express, MongoDB (Mongoose), JWT, Bcryptjs, Express-Validator, Helmet.
+
+## 🚦 Getting Started
+
+### 1. Configure Environment Variables
+
+Before starting the application, ensure your `.env` files are correctly set up.
+
+**Server (`server/.env`)**:
+```env
+PORT=5000
+NODE_ENV=development
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret_string
+JWT_EXPIRES_IN=1d
+CLIENT_ORIGIN=http://localhost:5173
+
+# Rate Limiting
+LOGIN_RATE_LIMIT_WINDOW_MS=900000
+LOGIN_RATE_LIMIT_MAX=10
+
+# Seed Admin Credentials (required for npm run seed)
+SEED_ADMIN_EMAIL=your_admin_email
+SEED_ADMIN_PASSWORD=your_secure_password
+SEED_ADMIN_NAME=your_admin_name
 ```
 
-## Requirements
+**Client (`client/.env`)**:
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
-- Node.js 18+
-- A MongoDB connection string (local `mongod`, or a free MongoDB Atlas cluster)
+### 2. Start the Backend Server
 
-## Setup & Run (clean clone → running app in under 5 minutes)
-
-### 1. Server
+Open a terminal, navigate to the `server` directory, and start the development server:
 
 ```bash
 cd server
-cp .env.example .env
-# edit .env: set MONGO_URI to your Mongo connection string, and set JWT_SECRET
-# to any long random string (e.g. `openssl rand -hex 32`)
 npm install
-npm run dev          # starts on http://localhost:5000
+npm run dev
 ```
+The API will be available at `http://localhost:5000`.
 
-Public registration only ever creates `viewer` accounts (see "Security & Design Decisions" below).
-To get an `admin` account for testing create/edit/delete, run the seed script once the server's
-`.env` is configured:
+### 3. Start the Frontend Client
 
-```bash
-npm run seed
-# creates admin@example.com / ChangeMe123! (override with SEED_ADMIN_EMAIL /
-# SEED_ADMIN_PASSWORD env vars), or promotes that email to admin if it already exists
-```
-
-### 2. Client
-
-In a second terminal:
+Open a second terminal, navigate to the `client` directory, and start the Vite development server:
 
 ```bash
 cd client
-cp .env.example .env    # VITE_API_URL defaults to http://localhost:5000/api, matches the server above
 npm install
-npm run dev              # starts on http://localhost:5173
+npm run dev
+```
+The web app will be available at `http://localhost:5173`.
+
+## 🔐 Creating an Admin Account
+
+By default, public registration via the web interface only provisions `viewer` accounts for security purposes. To create your first `admin` account, you must run the database seed script. 
+
+Ensure your database is running, then execute the following in the `server` directory:
+
+```bash
+npm run seed
 ```
 
-Open `http://localhost:5173`. Register a normal (viewer) account, or log in with the seeded admin
-account to add/edit/delete sites.
+This will read the `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` from your `server/.env` file and provision the master administrator account.
 
-### Quick smoke test
+## 📡 API Reference
 
-- `GET http://localhost:5000/api/health` should return `{"success":true,"data":{"status":"ok",...}}`.
-- Register a viewer in the UI, confirm the dashboard loads but shows no Add/Edit/Delete controls.
-- Log in as the seeded admin, add a site, edit it, delete it, and confirm search/status filter and
-  pagination work once you have more than 8 sites.
+All API responses follow a consistent envelope structure:
+`{ "success": true, "data": ... }` or `{ "success": false, "error": { "message": "..." } }`
 
-## API Overview
-
-All responses share one envelope shape:
-- Success: `{ "success": true, "data": ..., "meta"?: { page, limit, total, totalPages } }`
-- Error: `{ "success": false, "error": { "message": "...", "details"?: [...] } }`
-
-| Method | Route              | Auth            | Notes                                   |
-|--------|---------------------|-----------------|------------------------------------------|
-| POST   | /api/auth/register  | public          | creates a `viewer` account               |
-| POST   | /api/auth/login      | public (rate-limited) | returns JWT                        |
-| GET    | /api/auth/me         | any logged-in user | current user profile                 |
-| GET    | /api/sites            | any logged-in user | `?page&limit&status&search`         |
-| GET    | /api/sites/:id        | any logged-in user |                                       |
-| POST   | /api/sites             | admin only        | create a site record                  |
-| PATCH  | /api/sites/:id         | admin only        | partial update                        |
-| DELETE | /api/sites/:id         | admin only        | 403 (not 500) if called by a viewer   |
-
-## Security & Design Decisions
-
-- **Auth**: stateless JWT (not sessions) — simplest fit for a small SPA + API split, no server-side
-  session store to manage. Tokens are signed with a secret from `.env`, expire in 1 day
-  (`JWT_EXPIRES_IN`), and are sent as `Authorization: Bearer <token>`. Passwords are hashed with
-  bcrypt (cost factor 12) and the schema uses `select: false` so the hash is never returned by a
-  normal query, plus a `toJSON` transform as a second safety net.
-- **Roles, not self-service admin**: registration always creates a `viewer`. If it created whatever
-  role the client requested, anyone could `POST /register {"role":"admin"}` and grant themselves
-  write access. The first admin is created via a one-off `npm run seed` script instead — deliberately
-  out of the public API surface.
-- **Role-protected routes return 403, not 500**: `requireRole('admin')` runs after `requireAuth` and
-  throws a typed `ApiError.forbidden()`, which the central error handler maps to a clean 403 JSON
-  body — never a crash or a raw stack trace.
-- **Centralized error handling**: every controller is wrapped in `asyncHandler` so rejected promises
-  reach one `errorHandler` middleware. Known `ApiError`s pass their status/message through; Mongoose
-  validation/cast/duplicate-key errors are mapped to sane 400/409s; anything unrecognized is logged
-  server-side only and returned to the client as a generic 500 message — internals never leak.
-- **Input validation and sanitization**: `express-validator` checks shape/type/length on every
-  auth and site route before a controller runs. Separately, free-text fields (`name`, `url`,
-  `notes`) are passed through `sanitize-html` (strips all tags/attributes) before being stored, so a
-  note like `<script>...</script>` is neutralized at write time rather than trusted at render time.
-  `express-mongo-sanitize` strips any `$`/`.` keys from `body`/`query`/`params` to block MongoDB
-  operator injection (e.g. `{"email": {"$gt": ""}}` as a login payload).
-- **Rate limiting**: `express-rate-limit` on `POST /api/auth/login` only (10 attempts / 15 min by
-  default, both tunable via `.env`) to blunt brute-force credential guessing without punishing normal
-  API usage elsewhere.
-- **No hardcoded secrets**: `JWT_SECRET`, `MONGO_URI`, CORS origin, and rate-limit knobs all come from
-  environment variables via `dotenv`. The server refuses to start if `MONGO_URI` or `JWT_SECRET` is
-  missing, so a misconfigured deploy fails loudly instead of silently running insecurely. `.env` is
-  gitignored; `.env.example` documents every variable.
-- **Pagination + filtering**: `GET /api/sites` takes `page`/`limit` (capped at 100/page) plus optional
-  `status` and a text `search` (backed by a Mongo text index on `name`/`url`) so the endpoint never
-  dumps the full collection.
-- **Consistent response envelope**: every success and error response shares the same
-  `{ success, data|error }` shape (see `utils/ApiResponse.js`), so the client's axios interceptor can
-  normalize errors in one place instead of per-request try/catch spaghetti.
-- **Helmet + CORS**: `helmet()` sets standard security headers; CORS is locked to `CLIENT_ORIGIN`
-  from `.env` rather than left wide open.
-
-### What I'd add with more time
-
-- Refresh tokens / logout-everywhere (a leaked JWT is valid until it expires; there's no revocation
-  list yet).
-- An admin-only endpoint to change a user's role via the API, instead of only via the seed script —
-  fine for a small internal tool, but doesn't scale past a couple of admins.
-- Server-side + client-side automated tests (Jest/Supertest for the API, React Testing Library for
-  the UI) — everything above was exercised manually and via `npm run build`, but there's no CI suite.
-- Audit logging of who changed/deleted which site record, since this is explicitly an internal
-  reliability tool.
-- Optimistic UI updates on the dashboard instead of a full refetch after every mutation.
-
-## Out of scope (per the brief)
-
-Deployment/hosting, email verification, password reset, and third-party OAuth were intentionally
-not implemented.
+| Method | Endpoint              | Auth Required   | Description                               |
+|--------|-----------------------|-----------------|-------------------------------------------|
+| POST   | `/api/auth/register`  | Public          | Creates a new `viewer` account.           |
+| POST   | `/api/auth/login`     | Public          | Authenticates a user and returns a JWT.   |
+| GET    | `/api/auth/me`        | Logged In       | Returns the current user's profile.       |
+| GET    | `/api/users`          | Admin Only      | Lists all users (used for assignments).   |
+| GET    | `/api/sites`          | Logged In       | Fetches site targets (supports filters).  |
+| GET    | `/api/sites/:id`      | Logged In       | Fetches a specific site target by ID.     |
+| POST   | `/api/sites`          | Admin Only      | Creates a new site target.                |
+| PATCH  | `/api/sites/:id`      | Admin Only      | Updates an existing site target.          |
+| DELETE | `/api/sites/:id`      | Admin Only      | Deletes a site target.                    |
