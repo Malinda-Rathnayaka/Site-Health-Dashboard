@@ -1,234 +1,29 @@
-/* ===== GLOBAL RESET & BASE ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@import "tailwindcss";
 
-body {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  background-color: #0a0a0a;
-  color: #e5e5e5;
-  line-height: 1.5;
-  min-height: 100vh;
-}
-
-/* ===== LAYOUT UTILITIES ===== */
-.relative { position: relative; }
-.absolute { position: absolute; }
-.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-.z-0 { z-index: 0; }
-.z-10 { z-index: 10; }
-.z-20 { z-index: 20; }
-.w-full { width: 100%; }
-.h-full { height: 100%; }
-.min-h-screen { min-height: 100vh; }
-.max-w-md { max-width: 28rem; }
-.flex { display: flex; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.px-4 { padding-left: 1rem; padding-right: 1rem; }
-.py-12 { padding-top: 3rem; padding-bottom: 3rem; }
-.bottom-4 { bottom: 1rem; }
-.left-0 { left: 0; }
-.right-0 { right: 0; }
-.text-center { text-align: center; }
-.text-white\/60 { color: rgba(255, 255, 255, 0.6); }
-.text-sm { font-size: 0.875rem; }
-.object-cover { object-fit: cover; }
-.bg-black\/50 { background-color: rgba(0, 0, 0, 0.5); }
-
-/* ===== ANIMATION ===== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.98) translateY(8px);
+/* ===== GLOBAL RESET (must come after Tailwind import) ===== */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+
+  html,
+  body {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background-color: #0a0a0a;
+    color: #e5e5e5;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.4s ease-out;
-}
-
-/* ===== CARD STYLES ===== */
-.card {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-  width: 100%;
-}
-
-.auth-card {
-  width: 100%;
-}
-
-/* ===== TYPOGRAPHY ===== */
-h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #ffffff;
-  margin-bottom: 0.25rem;
-  line-height: 1.2;
-}
-
-.muted {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.95rem;
-}
-
-/* ===== ALERT ===== */
-.alert {
-  padding: 0.75rem 1rem;
-  border-radius: 0.65rem;
-  font-size: 0.9rem;
-  margin: 1.25rem 0;
-}
-
-.alert-error {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  color: #f87171;
-  text-align: center;
-}
-
-/* ===== FORM ===== */
-form {
-  margin-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.field label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #d1d5db;
-  letter-spacing: 0.01em;
-}
-
-.field input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.65rem;
-  color: #ffffff;
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  font-family: inherit;
-}
-
-.field input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.field input:focus {
-  border-color: rgba(168, 85, 247, 0.6);
-  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* ===== BUTTON ===== */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.8rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  border-radius: 0.65rem;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-  font-family: inherit;
-  letter-spacing: 0.01em;
-  line-height: 1.4;
-}
-
-.btn-primary {
-  background: #9333ea;
-  color: #ffffff;
-  box-shadow: 0 8px 16px -6px rgba(147, 51, 234, 0.4);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #7e22ce;
-  box-shadow: 0 12px 20px -8px rgba(147, 51, 234, 0.55);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 8px 16px -6px rgba(147, 51, 234, 0.4);
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background: #6b21a8;
-  box-shadow: none;
-  transform: none;
-}
-
-/* ===== LINKS ===== */
-.muted a {
-  color: #c084fc;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.muted a:hover {
-  color: #d8b4fe;
-  text-decoration: underline;
-}
-
-/* ===== FOCUS VISIBLE ===== */
-button:focus-visible {
-  outline: 2px solid #a855f7;
-  outline-offset: 2px;
-}
-
-/* ===== VIDEO STYLES ===== */
-video {
-  display: block;
-  max-width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #0a0a0a;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 480px) {
-  .card {
-    padding: 1.5rem 1.25rem;
-    border-radius: 0.85rem;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-  }
-
-  .btn {
-    padding: 0.7rem 1.25rem;
-  }
-
-  .px-4 { padding-left: 0.75rem; padding-right: 0.75rem; }
-  .py-12 { padding-top: 2rem; padding-bottom: 2rem; }
-}
+/* ===== AUTH PAGE STYLES (scoped) ===== */
+.auth-page .video-container { /* ...keep your existing rules... */ }
