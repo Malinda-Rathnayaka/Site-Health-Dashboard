@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: dark;
+  --page: #090b12;
+  --surface: rgba(15, 18, 29, 0.76);
+  --surface-soft: rgba(255, 255, 255, 0.045);
+  --surface-raised: rgba(255, 255, 255, 0.07);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --text-strong: #f8fafc;
+  --text: #cbd5e1;
+  --muted: #94a3b8;
+  --accent: #a78bfa;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --page: #f4f7fb;
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-soft: rgba(255, 255, 255, 0.72);
+  --surface-raised: #ffffff;
+  --line: rgba(15, 23, 42, 0.11);
+  --line-soft: rgba(15, 23, 42, 0.07);
+  --text-strong: #172033;
+  --text: #334155;
+  --muted: #64748b;
+  --accent: #6d28d9;
+}
+
 /* ===== GLOBAL RESET (must come after Tailwind import) ===== */
 @layer base {
   *,
@@ -17,13 +45,36 @@
 
   body {
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    background-color: #0a0a0a;
-    color: #e5e5e5;
+    background-color: var(--page);
+    color: var(--text);
     line-height: 1.5;
     margin: 0;
     padding: 0;
   }
 }
 
+.dashboard-shell { background: var(--page); color: var(--text); transition: background-color 220ms ease, color 220ms ease; }
+.dashboard-shell h1, .dashboard-shell h3, .dashboard-shell .text-white { color: var(--text-strong) !important; }
+.dashboard-shell .muted, .dashboard-shell .text-zinc-100, .dashboard-shell .text-zinc-400, .dashboard-shell .text-zinc-500, .dashboard-shell .text-zinc-300, .dashboard-shell .text-zinc-200, .dashboard-shell .text-zinc-600 { color: var(--muted) !important; }
+.dashboard-shell .accent, .dashboard-shell .text-purple-300, .dashboard-shell .text-purple-400 { color: var(--accent) !important; }
+.dashboard-shell .navbar-shell, .dashboard-shell .bg-black\/40, .dashboard-shell .bg-black\/30 { background: var(--surface) !important; border-color: var(--line) !important; }
+.dashboard-shell .bg-slate-950\/90, .dashboard-shell .bg-slate-950\/40 { background: var(--surface) !important; }
+.dashboard-shell .bg-white\/5, .dashboard-shell .bg-white\/10 { background: var(--surface-soft) !important; }
+.dashboard-shell .border-white\/10, .dashboard-shell .border-white\/\[0\.08\] { border-color: var(--line) !important; }
+.dashboard-shell .border-white\/\[0\.06\], .dashboard-shell .border-white\/\[0\.04\] { border-color: var(--line-soft) !important; }
+.dashboard-shell .bg-white\/\[0\.03\] { background: var(--surface-soft) !important; }
+.dashboard-shell .online-pill { border: 1px solid var(--line); background: var(--surface); }
+.dashboard-shell .theme-toggle { border: 1px solid var(--line); background: var(--surface-soft); color: var(--muted); transition: 180ms ease; }
+.dashboard-shell .theme-toggle:hover { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--surface-raised); }
+.dashboard-shell input, .dashboard-shell select { color: var(--text) !important; border-color: var(--line) !important; background: var(--surface-soft) !important; }
+.dashboard-shell input::placeholder { color: var(--muted); }
+.dashboard-shell option { background: var(--surface-raised); color: var(--text-strong); }
+.theme-light .topology-background { opacity: 0.42; }
+.theme-light .topology-wash { background: rgba(244, 247, 251, 0.68) !important; }
+.theme-light .topology-gradient { background: linear-gradient(135deg, rgba(219, 234, 254, 0.42), rgba(237, 233, 254, 0.28), rgba(224, 242, 254, 0.34)) !important; }
+.theme-light .topology-vignette { background: radial-gradient(ellipse at center, transparent 38%, rgba(226, 232, 240, 0.52) 100%) !important; }
+.theme-light .topology-background .border-purple-500\/10 { border-color: rgba(109, 40, 217, 0.12) !important; }
+.theme-light .topology-background .border-indigo-500\/\[0\.06\] { border-color: rgba(79, 70, 229, 0.08) !important; }
+.theme-light .bg-gradient-to-r .text-white, .theme-light .bg-gradient-to-tr .text-white, .theme-light .bg-gradient-to-br .text-white { color: #ffffff !important; }
+
 /* ===== AUTH PAGE STYLES (scoped) ===== */
-.auth-page .video-container { /* ...keep your existing rules... */ }
