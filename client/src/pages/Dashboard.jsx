@@ -43,16 +43,16 @@ const STATUS_STYLES = {
 };
 
 /* ── Cinematic topology background ──────────────────── */
-function TopologyBackground() {
+function TopologyBackground({ theme }) {
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+    <div className={`topology-background fixed inset-0 z-0 overflow-hidden pointer-events-none ${theme}`}>
       <div className="absolute inset-0">
         <TopologyField nodeCount={70} />
       </div>
 
-      <div className="absolute inset-0 bg-black/55" />
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-indigo-950/25 to-fuchsia-900/20" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(0,0,0,0.85)_100%)]" />
+      <div className="topology-wash absolute inset-0 bg-black/55" />
+      <div className="topology-gradient absolute inset-0 bg-gradient-to-br from-purple-900/40 via-indigo-950/25 to-fuchsia-900/20" />
+      <div className="topology-vignette absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(0,0,0,0.85)_100%)]" />
 
       <div className="pointer-events-none absolute -right-40 -top-40 h-[520px] w-[520px] animate-[spin_60s_linear_infinite] rounded-full border border-purple-500/10" />
       <div className="pointer-events-none absolute -right-40 -top-40 h-[720px] w-[720px] animate-[spin_90s_linear_infinite_reverse] rounded-full border border-indigo-500/[0.06]" />
@@ -63,6 +63,7 @@ function TopologyBackground() {
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const isAdmin = user?.role === 'admin';
+  const [theme, setTheme] = useState(() => localStorage.getItem('site-health-theme') || 'dark');
 
   const [sites, setSites] = useState([]);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
@@ -95,6 +96,11 @@ export default function Dashboard() {
   }, [page, status, search]);
 
   useEffect(() => { fetchSites(); }, [fetchSites]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('site-health-theme', theme);
+  }, [theme]);
 
   const summary = useMemo(() => {
     const counts = { healthy: 0, warning: 0, critical: 0 };
@@ -184,8 +190,8 @@ export default function Dashboard() {
       : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden text-slate-100 antialiased">
-      <TopologyBackground />
+    <div className={`dashboard-shell theme-${theme} relative min-h-screen w-full overflow-x-hidden antialiased`}>
+      <TopologyBackground theme={theme} />
 
       <Navbar
         user={user}
@@ -194,32 +200,34 @@ export default function Dashboard() {
         search={search}
         onSearchChange={(val) => { setPage(1); setSearch(val); }}
         notifications={[]}
+        theme={theme}
+        onThemeToggle={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')}
       />
 
       <main className="relative z-10 mx-auto max-w-7xl px-6 py-8 md:px-8">
         {/* Hero */}
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="dashboard-hero mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="mb-1.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-purple-300">
+            <p className="eyebrow mb-1.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
               <Radio className="h-3 w-3" />
               Global Mission Status
             </p>
-            <h1 className="text-2xl font-bold tracking-tight text-white md:text-4xl">
+            <h1 className="text-2xl font-bold tracking-tight md:text-4xl">
               Welcome back, {user?.name?.split(' ')[0] || 'Operator'}
             </h1>
-            <p className="mt-2 flex items-center gap-2 text-sm text-zinc-400">
-              <Orbit className="h-3.5 w-3.5 text-purple-400" />
+            <p className="muted mt-2 flex items-center gap-2 text-sm">
+              <Orbit className="accent h-3.5 w-3.5" />
               {meta.total} endpoints in orbit · {summary.healthy} healthy · {summary.critical} critical
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-2.5 backdrop-blur-md">
+            <div className="online-pill flex items-center gap-2 rounded-2xl px-4 py-2.5 backdrop-blur-md">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              <span className="text-xs font-medium text-zinc-300">Systems online</span>
+              <span className="muted text-xs font-medium">Systems online</span>
             </div>
           </div>
         </div>

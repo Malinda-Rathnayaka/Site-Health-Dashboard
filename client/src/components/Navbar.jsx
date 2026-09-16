@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Search, Bell, Settings, LogOut, Menu, X,
-  Activity, ChevronDown, User, Shield, HelpCircle, Command
+  Activity, ChevronDown, User, Shield, HelpCircle, Command, Sun, Moon
 } from 'lucide-react';
 
 export default function Navbar({
@@ -12,6 +12,8 @@ export default function Navbar({
   search,
   onSearchChange,
   notifications = [],
+  theme = 'dark',
+  onThemeToggle,
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -26,7 +28,7 @@ export default function Navbar({
   return (
     <header className="sticky top-0 z-50 w-full px-4 pt-3 pb-2 transition-all duration-300 md:px-6">
       {/* ── Floating Glass Navbar Container ─────────────────── */}
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-3xl border border-white/[0.08] bg-slate-950/40 px-4 py-2.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] backdrop-blur-2xl transition-all duration-300 hover:border-white/[0.12] md:px-6 md:py-3">
+      <div className="navbar-shell mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-3xl px-4 py-2.5 backdrop-blur-2xl transition-all duration-300 md:px-6 md:py-3">
 
         {/* ── LEFT: Brand Logo & Title ───────────────────── */}
         <div className="flex items-center gap-3">
@@ -47,10 +49,10 @@ export default function Navbar({
             </div>
 
             <div className="flex flex-col">
-              <span className="text-sm font-extrabold tracking-tight text-white">
+              <span className="text-sm font-extrabold tracking-tight">
                 Site Health Dashboard
               </span>
-              <span className="text-[10px] font-medium tracking-wide text-zinc-400">
+              <span className="muted text-[10px] font-medium tracking-wide">
                 Real-time System Monitoring
               </span>
             </div>
@@ -76,6 +78,15 @@ export default function Navbar({
           </div>
 
           <div className="h-5 w-[1px] bg-white/10" />
+
+          <button
+            onClick={onThemeToggle}
+            className="theme-toggle grid h-10 w-10 place-items-center rounded-2xl"
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
 
           {/* Notifications Button */}
           <button
@@ -199,6 +210,15 @@ export default function Navbar({
                 <span className="text-[10px] text-zinc-400">{user?.email || 'operator@sitehealth.io'}</span>
               </div>
             </div>
+
+            <button
+              onClick={onThemeToggle}
+              className="theme-toggle flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-xs font-semibold"
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            </button>
 
             <button
               onClick={onLogout}
